@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\ClaimController;
 
 Route::prefix('v1')->group(function () {
     Route::post('/auth/register', [AuthController::class, 'register']);
@@ -18,5 +19,12 @@ Route::prefix('v1')->group(function () {
         // Rute Laporan Barang
         Route::post('/items', [ItemController::class, 'store']);
         Route::patch('/items/{id}/release', [ItemController::class, 'release']);
+        
+        // Rute Klaim Barang (Fase 4)
+        Route::get('/claims', [ClaimController::class, 'index']);
+        Route::get('/claims/my-claims', [ClaimController::class, 'myClaims']);
+        Route::post('/claims', [ClaimController::class, 'store']);
+        Route::get('/claims/{id}', [ClaimController::class, 'show']);
+        Route::patch('/claims/{id}/verify', [ClaimController::class, 'verify']);
     });
 });
