@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ClaimController;
+use App\Http\Controllers\HandoverController;
 
 Route::prefix('v1')->group(function () {
     Route::post('/auth/register', [AuthController::class, 'register']);
@@ -26,5 +27,9 @@ Route::prefix('v1')->group(function () {
         Route::post('/claims', [ClaimController::class, 'store']);
         Route::get('/claims/{id}', [ClaimController::class, 'show']);
         Route::patch('/claims/{id}/verify', [ClaimController::class, 'verify']);
+        
+        // Rute Serah Terima & Arsip (Fase 5)
+        Route::post('/handovers', [HandoverController::class, 'store']);
+        Route::get('/handovers/{id}', [HandoverController::class, 'show']);
     });
 });
