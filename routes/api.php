@@ -23,6 +23,8 @@ Route::prefix('v1')->group(function () {
 
         // Rute Lokasi
         Route::get('/locations', [\App\Http\Controllers\LocationController::class, 'index']);
+        Route::post('/locations', [\App\Http\Controllers\LocationController::class, 'store']);
+        Route::delete('/locations/{id}', [\App\Http\Controllers\LocationController::class, 'destroy']);
 
         // Rute Laporan Barang
         Route::post('/items', [ItemController::class, 'store']);
