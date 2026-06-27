@@ -21,6 +21,9 @@ Route::prefix('v1')->group(function () {
         Route::get('/users', [\App\Http\Controllers\UserController::class, 'index']);
         Route::delete('/users/{id}', [\App\Http\Controllers\UserController::class, 'destroy']);
 
+        // Rute Lokasi
+        Route::get('/locations', [\App\Http\Controllers\LocationController::class, 'index']);
+
         // Rute Laporan Barang
         Route::post('/items', [ItemController::class, 'store']);
         Route::patch('/items/{id}/release', [ItemController::class, 'release']);
