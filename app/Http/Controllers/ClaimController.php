@@ -16,7 +16,7 @@ class ClaimController extends Controller
             return response()->json(['success' => false, 'message' => 'Akses ditolak.'], 403);
         }
 
-        $claims = Claim::with(['item', 'user'])->latest('tanggal_klaim')->paginate(10);
+        $claims = Claim::with(['item', 'user'])->latest('tanggal_klaim')->get();
         return response()->json(['success' => true, 'data' => $claims]);
     }
 
