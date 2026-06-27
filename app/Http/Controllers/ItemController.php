@@ -44,6 +44,28 @@ class ItemController extends Controller
         return response()->json(['success' => true, 'data' => $items]);
     }
 
+    // GET /api/v1/admin/items (Admin Dashboard & Antrean)
+    public function adminIndex(Request $request)
+    {
+        if ($request->user()->role !== 'satpam') {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        $query = Item::with(['category', 'location', 'user']);
+
+        if ($request->has('visibility')) {
+            $query->where('visibility', $request->visibility);
+        }
+
+        if ($request->has('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $items = $query->latest('tanggal_lapor')->paginate(50);
+
+        return response()->json(['success' => true, 'data' => $items]);
+    }
+
     // POST /api/v1/items (Laporan Baru)
     public function store(Request $request)
     {
@@ -101,6 +123,24 @@ class ItemController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Barang fisik divalidasi. Laporan dipublikasikan.',
+            'data' => $item
+        ]);
+    }
+
+    // GET /api/v1/items/{id} (Ambil detail barang spesifik)
+    public function show($id)
+    {
+        $item = Item::with(['category', 'location', 'user'])->find($id);
+
+        if (!$item) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Barang tidak ditemukan.'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
             'data' => $item
         ]);
     }

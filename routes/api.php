@@ -11,6 +11,7 @@ Route::prefix('v1')->group(function () {
     
     // Rute Publik (Mading Digital)
     Route::get('/items', [ItemController::class, 'index']);
+    Route::get('/items/{id}', [ItemController::class, 'show']);
 
     // Rute yang butuh Token JWT/Sanctum
     Route::middleware('auth:sanctum')->group(function () {
@@ -27,6 +28,7 @@ Route::prefix('v1')->group(function () {
         Route::delete('/locations/{id}', [\App\Http\Controllers\LocationController::class, 'destroy']);
 
         // Rute Laporan Barang
+        Route::get('/admin/items', [ItemController::class, 'adminIndex']);
         Route::post('/items', [ItemController::class, 'store']);
         Route::patch('/items/{id}/release', [ItemController::class, 'release']);
         
