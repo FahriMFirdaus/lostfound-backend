@@ -22,6 +22,10 @@ Route::prefix('v1')->group(function () {
         return 'No logs found.';
     });
 
+    Route::get('/debug-users', function () {
+        return response()->json(\App\Models\User::all());
+    });
+
     // Rute yang butuh Token JWT/Sanctum
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/auth/profile', [AuthController::class, 'profile']);
