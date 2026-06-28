@@ -10,13 +10,15 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            ['nama_kategori' => 'Elektronik', 'created_at' => now(), 'updated_at' => now()],
-            ['nama_kategori' => 'Dokumen (KTM/KTP)', 'created_at' => now(), 'updated_at' => now()],
-            ['nama_kategori' => 'Kunci', 'created_at' => now(), 'updated_at' => now()],
-            ['nama_kategori' => 'Pakaian / Aksesoris', 'created_at' => now(), 'updated_at' => now()],
-            ['nama_kategori' => 'Lain-lain', 'created_at' => now(), 'updated_at' => now()],
+            ['nama_kategori' => 'Elektronik'],
+            ['nama_kategori' => 'Dokumen (KTM/KTP)'],
+            ['nama_kategori' => 'Kunci'],
+            ['nama_kategori' => 'Pakaian / Aksesoris'],
+            ['nama_kategori' => 'Lain-lain'],
         ];
 
-        DB::table('categories')->insert($categories);
+        foreach ($categories as $cat) {
+            \App\Models\Category::updateOrCreate(['nama_kategori' => $cat['nama_kategori']], $cat);
+        }
     }
 }
