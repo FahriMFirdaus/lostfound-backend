@@ -71,7 +71,7 @@ class ClaimController extends Controller
     // GET /api/v1/claims/{id} (Detail Peninjauan Berkas)
     public function show($id)
     {
-        $claim = Claim::with(['item', 'user'])->findOrFail($id);
+        $claim = Claim::with(['item', 'user', 'handover'])->findOrFail($id);
         return response()->json(['success' => true, 'data' => $claim]);
     }
 
