@@ -33,7 +33,8 @@ class ClaimController extends Controller
         $request->validate([
             'item_id' => 'required|exists:items,id',
             'bukti_teks' => 'required|string',
-            'bukti_foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'foto_ktp' => 'required|image|mimes:jpg,jpeg,png|max:5120',
+            'foto_bukti_pendukung' => 'required|image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
         $item = Item::findOrFail($request->item_id);
@@ -51,18 +52,30 @@ class ClaimController extends Controller
             return response()->json(['success' => false, 'message' => 'Anti-Spam Shield Aktif: Anda sudah mencapai batas maksimal 2 klaim yang sedang diproses.'], 429);
         }
 
-        $path = null;
-        if ($request->hasFile('bukti_foto')) {
-            $path = $request->file('bukti_foto')->store('claims', 'public');
+        $fotoKtp = null;
+        if ($request->hasFile('foto_ktp')) {
+            $fotoKtp = $request->file('foto_ktp')->store('claims/ktp', 'public');
+        }
+
+        $fotoBukti = null;
+        if ($request->hasFile('foto_bukti_pendukung')) {
+            $fotoBukti = $request->file('foto_bukti_pendukung')->store('claims/proofs', 'public');
         }
 
         $claim = Claim::create([
             'item_id' => $request->item_id,
             'user_id' => $request->user()->id,
             'bukti_teks' => $request->bukti_teks,
-            'bukti_foto' => $path,
+            'foto_ktp' => $fotoKtp,
+            'foto_bukti_pendukung' => $fotoBukti,
             'status_verif' => 'pending',
             'tanggal_klaim' => now()
+        ]);
+
+        $claim->activityLogs()->create([
+            'action_type' => 'created',
+            'description' => 'Mengajukan klaim verifikasi kepemilikan',
+            'user_id' => $request->user()->id,
         ]);
 
         return response()->json(['success' => true, 'message' => 'Klaim berhasil diajukan dan menunggu evaluasi Satpam.', 'data' => $claim], 201);
@@ -71,7 +84,14 @@ class ClaimController extends Controller
     // GET /api/v1/claims/{id} (Detail Peninjauan Berkas)
     public function show($id)
     {
-        $claim = Claim::with(['item', 'user', 'handover'])->findOrFail($id);
+        $claim = Claim::with(['item.location', 'item.category', 'user', 'handover', 'activityLogs', 'item.activityLogs'])->findOrFail($id);
+        return response()->json(['success' => true, 'data' => $claim]);
+    }
+
+    // GET /api/v1/claims/token/{token} (Lihat Klaim Berdasarkan Token)
+    public function getByToken($token)
+    {
+        $claim = Claim::with(['item.location', 'item.category', 'user'])->where('token_pengambilan', $token)->firstOrFail();
         return response()->json(['success' => true, 'data' => $claim]);
     }
 
@@ -98,6 +118,22 @@ class ClaimController extends Controller
         }
 
         $claim->save();
+
+        $logDesc = 'Status klaim diubah menjadi: ' . $request->status_verif;
+        if ($request->status_verif === 'approved') {
+            $logDesc = 'Klaim disetujui. Silakan datang ke pos satpam untuk mengambil barang.';
+        } elseif ($request->status_verif === 'clarification_required') {
+            $logDesc = 'Klaim butuh klarifikasi: ' . $request->catatan_evaluasi;
+        }
+
+        $claim->activityLogs()->create([
+            'action_type' => 'status_changed',
+            'description' => $logDesc,
+            'user_id' => $request->user()->id,
+            'metadata' => [
+                'status' => $request->status_verif
+            ]
+        ]);
 
         return response()->json([
             'success' => true, 

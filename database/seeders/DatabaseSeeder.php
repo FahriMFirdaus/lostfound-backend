@@ -73,6 +73,7 @@ class DatabaseSeeder extends Seeder
                 'post_type' => $type,
                 'tanggal_lapor' => Carbon::now()->subDays(rand(0, 10)),
                 'status' => $status,
+                'visibility' => 'public', // SET PUBLIC SO THEY SHOW IN MADING
                 'user_id' => $i % 2 == 0 ? $mahasiswa2->id : $mahasiswa1->id,
                 'category_id' => $kategories[array_rand($kategories)]->id,
                 'location_id' => $lokasis[array_rand($lokasis)]->id,

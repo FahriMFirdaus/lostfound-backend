@@ -79,6 +79,83 @@ class AuthController extends Controller
         ]);
     }
 
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'nama_lengkap' => 'required|string|max:100',
+            'no_hp' => 'required|string|max:15',
+            'password' => 'nullable|string|min:6|confirmed',
+        ]);
+
+        $user->nama_lengkap = $request->nama_lengkap;
+        $user->no_hp = $request->no_hp;
+
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Profil berhasil diperbarui.',
+            'data' => $user
+        ]);
+    }
+
+    public function stats(Request $request)
+    {
+        $user = $request->user();
+        
+        $klaim_berjalan = \App\Models\Claim::where('user_id', $user->id)
+            ->whereIn('status_verif', ['pending', 'clarification_required'])
+            ->count();
+            
+        $total_riwayat_items = \App\Models\Item::where('user_id', $user->id)->count();
+        $total_riwayat_claims = \App\Models\Claim::where('user_id', $user->id)->count();
+        $total_riwayat = $total_riwayat_items + $total_riwayat_claims;
+
+        $urgent_claim = \App\Models\Claim::with('item')
+            ->where('user_id', $user->id)
+            ->whereIn('status_verif', ['clarification_required'])
+            ->latest()
+            ->first();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'klaim_berjalan' => $klaim_berjalan,
+                'total_riwayat' => $total_riwayat,
+                'urgent_claim' => $urgent_claim
+            ]
+        ]);
+    }
+
+    public function riwayat(Request $request)
+    {
+        $user = $request->user();
+        
+        $items = \App\Models\Item::with(['category', 'location'])
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+        $claims = \App\Models\Claim::with(['item', 'item.category', 'item.location'])
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'items' => $items,
+                'claims' => $claims
+            ]
+        ]);
+    }
+
     public function logout(Request $request)
     {
         // Mencabut token saat ini

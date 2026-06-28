@@ -60,6 +60,12 @@ class HandoverController extends Controller
 
             $claim->status_verif = 'returned';
             $claim->save();
+
+            $claim->activityLogs()->create([
+                'action_type' => 'handover',
+                'description' => 'Validasi & Penyerahan Barang. Petugas Satpam memvalidasi dokumen dan menyerahkan barang fisik.',
+                'user_id' => $request->user()->id,
+            ]);
             
             return $handover;
         });
