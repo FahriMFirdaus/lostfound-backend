@@ -31,7 +31,8 @@ COPY nginx.conf /etc/nginx/sites-enabled/default
 COPY . /var/www
 
 # Install dependensi Laravel (abaikan require-dev)
-RUN composer install --no-dev --optimize-autoloader
+ENV COMPOSER_ALLOW_SUPERUSER=1
+RUN php -d memory_limit=-1 /usr/bin/composer install --no-dev --optimize-autoloader
 
 # Atur permission
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
