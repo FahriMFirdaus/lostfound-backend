@@ -15,6 +15,13 @@ Route::prefix('v1')->group(function () {
     Route::get('/items', [ItemController::class, 'index']);
     Route::get('/items/{id}', [ItemController::class, 'show']);
 
+    Route::get('/debug-logs', function () {
+        if (file_exists(storage_path('logs/laravel.log'))) {
+            return response(file_get_contents(storage_path('logs/laravel.log')), 200, ['Content-Type' => 'text/plain']);
+        }
+        return 'No logs found.';
+    });
+
     // Rute yang butuh Token JWT/Sanctum
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/auth/profile', [AuthController::class, 'profile']);
