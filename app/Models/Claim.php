@@ -20,4 +20,9 @@ class Claim extends Model
     {
         return $this->belongsTo(Item::class);
     }
+
+    public function handover()
+    {
+        return $this->hasOne(Handover::class);
+    }
 }
