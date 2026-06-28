@@ -32,7 +32,7 @@ COPY . /var/www
 
 # Install dependensi Laravel (abaikan require-dev)
 ENV COMPOSER_ALLOW_SUPERUSER=1
-RUN php -d memory_limit=-1 /usr/bin/composer install --no-dev --optimize-autoloader
+RUN php -d memory_limit=-1 /usr/bin/composer install --no-dev --optimize-autoloader --no-scripts
 
 # Atur permission
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache

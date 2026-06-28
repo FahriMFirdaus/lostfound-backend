@@ -7,6 +7,9 @@ php artisan storage:link
 php artisan config:clear
 php artisan cache:clear
 
+# Package discover
+php artisan package:discover --ansi
+
 # Jalankan migrasi database
 php artisan migrate --force
 
