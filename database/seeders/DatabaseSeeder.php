@@ -16,46 +16,18 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Buat Akun Satpam
-        $satpam = User::firstOrCreate(['email' => 'satpam@unper.ac.id'], [
-            'nama_lengkap' => 'Komandan Satpam',
-            'password' => Hash::make('password'),
-            'no_hp' => '08111111111',
-            'role' => 'satpam'
+        $this->call([
+            UserSeeder::class,
+            CategorySeeder::class,
+            LocationSeeder::class,
         ]);
 
-        // Buat Akun Mahasiswa
-        $mahasiswa1 = User::firstOrCreate(['email' => 'budi@student.unper.ac.id'], [
-            'nama_lengkap' => 'Budi Santoso',
-            'password' => Hash::make('password'),
-            'no_hp' => '08222222222',
-            'role' => 'student'
-        ]);
-
-        $mahasiswa2 = User::firstOrCreate(['email' => 'ani@student.unper.ac.id'], [
-            'nama_lengkap' => 'Ani Lestari',
-            'password' => Hash::make('password'),
-            'no_hp' => '08333333333',
-            'role' => 'student'
-        ]);
-
-        // Buat Kategori
-        $kategories = [
-            Category::firstOrCreate(['nama_kategori' => 'Elektronik']),
-            Category::firstOrCreate(['nama_kategori' => 'Aksesoris']),
-            Category::firstOrCreate(['nama_kategori' => 'Dokumen Pribadi']),
-            Category::firstOrCreate(['nama_kategori' => 'Pakaian']),
-            Category::firstOrCreate(['nama_kategori' => 'Lainnya']),
-        ];
-
-        // Buat Lokasi
-        $lokasis = [
-            Location::firstOrCreate(['nama_tempat' => 'Gedung Rektorat']),
-            Location::firstOrCreate(['nama_tempat' => 'Gedung Fakultas']),
-            Location::firstOrCreate(['nama_tempat' => 'Perpustakaan']),
-            Location::firstOrCreate(['nama_tempat' => 'Kantin']),
-            Location::firstOrCreate(['nama_tempat' => 'Parkiran']),
-        ];
+        $satpam = User::where('role', 'satpam')->first();
+        $mahasiswa1 = User::where('role', 'student')->first();
+        $mahasiswa2 = User::where('email', 'ani@student.unper.ac.id')->first() ?? User::where('role', 'student')->skip(1)->first() ?? $mahasiswa1;
+        
+        $kategories = Category::all()->all();
+        $lokasis = Location::all()->all();
 
         $faker = \Faker\Factory::create('id_ID');
 
