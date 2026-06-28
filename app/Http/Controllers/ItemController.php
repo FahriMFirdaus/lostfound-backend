@@ -31,7 +31,7 @@ class ItemController extends Controller
             });
         }
 
-        $items = $query->latest('tanggal_lapor')->paginate(10);
+        $items = $query->latest('tanggal_lapor')->paginate(5);
         
         // Privacy Shield: Menghapus kontak hp user dari API Publik
         $items->getCollection()->transform(function ($item) {
