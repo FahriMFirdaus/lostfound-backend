@@ -47,10 +47,13 @@ class HandoverController extends Controller
             'tanggal_serah_terima' => now(),
         ]);
 
-        // Archiving: Mengubah status barang secara permanen menjadi 'returned'
+        // Archiving: Mengubah status barang dan klaim menjadi 'returned'
         $item = $claim->item;
         $item->status = 'returned';
         $item->save();
+
+        $claim->status_verif = 'returned';
+        $claim->save();
 
         return response()->json([
             'success' => true,
