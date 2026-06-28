@@ -24,14 +24,20 @@ class ItemController extends Controller
             $query->where('category_id', $request->category_id);
         }
         
-        if ($request->has('q')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('judul', 'like', '%' . $request->q . '%')
-                  ->orWhere('deskripsi', 'like', '%' . $request->q . '%');
+        if ($request->has('q') && !empty($request->q)) {
+            $keywords = explode(' ', $request->q);
+            $query->where(function ($q) use ($keywords) {
+                foreach ($keywords as $word) {
+                    $word = trim($word);
+                    if (strlen($word) > 2) { // Minimal 3 huruf
+                        $q->orWhere('judul', 'like', '%' . $word . '%')
+                          ->orWhere('deskripsi', 'like', '%' . $word . '%');
+                    }
+                }
             });
         }
 
-        $items = $query->latest('tanggal_lapor')->paginate(10);
+        $items = $query->latest('tanggal_lapor')->paginate(5);
         
         // Privacy Shield: Menghapus kontak hp user dari API Publik
         $items->getCollection()->transform(function ($item) {
@@ -40,6 +46,28 @@ class ItemController extends Controller
             }
             return $item;
         });
+
+        return response()->json(['success' => true, 'data' => $items]);
+    }
+
+    // GET /api/v1/admin/items (Admin Dashboard & Antrean)
+    public function adminIndex(Request $request)
+    {
+        if ($request->user()->role !== 'satpam') {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        $query = Item::with(['category', 'location', 'user']);
+
+        if ($request->has('visibility')) {
+            $query->where('visibility', $request->visibility);
+        }
+
+        if ($request->has('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $items = $query->latest('tanggal_lapor')->paginate(5);
 
         return response()->json(['success' => true, 'data' => $items]);
     }
@@ -56,11 +84,24 @@ class ItemController extends Controller
             'category_id' => 'required|exists:categories,id',
             'location_id' => 'required|exists:locations,id',
             'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'bukti_teks' => 'nullable|string',
+            'foto_ktp' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+            'foto_bukti_pendukung' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
         $path = null;
         if ($request->hasFile('foto')) {
             $path = $request->file('foto')->store('items', 'public');
+        }
+
+        $fotoKtp = null;
+        if ($request->hasFile('foto_ktp')) {
+            $fotoKtp = $request->file('foto_ktp')->store('verifications/ktp', 'public');
+        }
+
+        $fotoBukti = null;
+        if ($request->hasFile('foto_bukti_pendukung')) {
+            $fotoBukti = $request->file('foto_bukti_pendukung')->store('verifications/proofs', 'public');
         }
 
         // Rule: Jika found (barang temu), otomatis jadi private (draft)
@@ -77,6 +118,15 @@ class ItemController extends Controller
             'tanggal_lapor' => $request->tanggal_lapor,
             'category_id' => $request->category_id,
             'location_id' => $request->location_id,
+            'user_id' => $request->user()->id,
+            'bukti_teks' => $request->bukti_teks,
+            'foto_ktp' => $fotoKtp,
+            'foto_bukti_pendukung' => $fotoBukti,
+        ]);
+
+        $item->activityLogs()->create([
+            'action_type' => 'created',
+            'description' => $request->post_type === 'lost' ? 'Laporan Kehilangan dibuat' : 'Laporan Penemuan dibuat',
             'user_id' => $request->user()->id,
         ]);
 
@@ -98,9 +148,51 @@ class ItemController extends Controller
         $item->visibility = 'public';
         $item->save();
 
+        $item->activityLogs()->create([
+            'action_type' => 'status_changed',
+            'description' => 'Membawa fisik barang ke Pos Satpam Utama dan sukses memindai Barcode Validasi Fisik',
+            'user_id' => $request->user()->id,
+        ]);
+
         return response()->json([
             'success' => true,
             'message' => 'Barang fisik divalidasi. Laporan dipublikasikan.',
+            'data' => $item
+        ]);
+    }
+
+    // GET /api/v1/items/{id} (Ambil detail barang spesifik)
+    public function show($id)
+    {
+        $item = Item::with(['category', 'location', 'user', 'activityLogs'])->find($id);
+
+        if (!$item) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Barang tidak ditemukan.'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $item
+        ]);
+    }
+
+    // PATCH /api/v1/items/{id}/reject (Penolakan Laporan Temuan)
+    public function reject(Request $request, $id)
+    {
+        if ($request->user()->role !== 'satpam') {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        $item = Item::findOrFail($id);
+        $item->status = 'rejected';
+        $item->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Laporan temuan berhasil ditolak.',
             'data' => $item
         ]);
     }

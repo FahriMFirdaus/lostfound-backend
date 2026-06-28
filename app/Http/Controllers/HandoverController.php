@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Claim;
 use App\Models\Handover;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class HandoverController extends Controller
 {
@@ -19,7 +21,7 @@ class HandoverController extends Controller
         $request->validate([
             'token_pengambilan' => 'required|string|exists:claims,token_pengambilan',
             'foto_materai' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'foto_serah_terima' => 'required|image|mimes:jpg,jpeg,png|max:2048', // Snapshot Webcam Satpam + Mahasiswa
+            'foto_serah_terima' => 'nullable|image|mimes:jpg,jpeg,png|max:4096'
         ]);
 
         // Verifikasi token 12-digit (LF-ORANGE-XXXXXX)
@@ -37,20 +39,36 @@ class HandoverController extends Controller
             $materaiPath = $request->file('foto_materai')->store('handovers', 'public');
         }
 
-        $serahTerimaPath = $request->file('foto_serah_terima')->store('handovers', 'public');
+        $serahTerimaPath = null;
+        if ($request->hasFile('foto_serah_terima')) {
+            $serahTerimaPath = $request->file('foto_serah_terima')->store('handovers_fisik', 'public');
+        }
 
-        $handover = Handover::create([
-            'claim_id' => $claim->id,
-            'admin_id' => $request->user()->id,
-            'foto_materai' => $materaiPath,
-            'foto_serah_terima' => $serahTerimaPath,
-            'tanggal_serah_terima' => now(),
-        ]);
+        $handover = DB::transaction(function () use ($claim, $request, $materaiPath, $serahTerimaPath) {
+            $handover = Handover::create([
+                'claim_id' => $claim->id,
+                'admin_id' => $request->user()->id,
+                'foto_materai' => $materaiPath,
+                'foto_serah_terima' => $serahTerimaPath,
+                'tanggal_serah_terima' => now(),
+            ]);
 
-        // Archiving: Mengubah status barang secara permanen menjadi 'returned'
-        $item = $claim->item;
-        $item->status = 'returned';
-        $item->save();
+            // Archiving: Mengubah status barang dan klaim menjadi 'returned'
+            $item = $claim->item;
+            $item->status = 'returned';
+            $item->save();
+
+            $claim->status_verif = 'returned';
+            $claim->save();
+
+            $claim->activityLogs()->create([
+                'action_type' => 'handover',
+                'description' => 'Validasi & Penyerahan Barang. Petugas Satpam memvalidasi dokumen dan menyerahkan barang fisik.',
+                'user_id' => $request->user()->id,
+            ]);
+            
+            return $handover;
+        });
 
         return response()->json([
             'success' => true,
