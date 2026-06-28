@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Claim;
 use App\Models\Handover;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class HandoverController extends Controller
 {
@@ -35,20 +37,24 @@ class HandoverController extends Controller
         if ($request->hasFile('foto_materai')) {
             $materaiPath = $request->file('foto_materai')->store('handovers', 'public');
         }
-        $handover = Handover::create([
-            'claim_id' => $claim->id,
-            'admin_id' => $request->user()->id,
-            'foto_materai' => $materaiPath,
-            'tanggal_serah_terima' => now(),
-        ]);
+        $handover = DB::transaction(function () use ($claim, $request, $materaiPath) {
+            $handover = Handover::create([
+                'claim_id' => $claim->id,
+                'admin_id' => $request->user()->id,
+                'foto_materai' => $materaiPath,
+                'tanggal_serah_terima' => now(),
+            ]);
 
-        // Archiving: Mengubah status barang dan klaim menjadi 'returned'
-        $item = $claim->item;
-        $item->status = 'returned';
-        $item->save();
+            // Archiving: Mengubah status barang dan klaim menjadi 'returned'
+            $item = $claim->item;
+            $item->status = 'returned';
+            $item->save();
 
-        $claim->status_verif = 'returned';
-        $claim->save();
+            $claim->status_verif = 'returned';
+            $claim->save();
+            
+            return $handover;
+        });
 
         return response()->json([
             'success' => true,

@@ -144,4 +144,22 @@ class ItemController extends Controller
             'data' => $item
         ]);
     }
+
+    // PATCH /api/v1/items/{id}/reject (Penolakan Laporan Temuan)
+    public function reject(Request $request, $id)
+    {
+        if ($request->user()->role !== 'satpam') {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        $item = Item::findOrFail($id);
+        $item->status = 'rejected';
+        $item->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Laporan temuan berhasil ditolak.',
+            'data' => $item
+        ]);
+    }
 }

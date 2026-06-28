@@ -1,0 +1,187 @@
+{
+  "info": {
+    "name": "LostFound Connect API",
+    "description": "Koleksi Endpoint API untuk sistem Lost and Found Connect (Backend Laravel 12). Siap di-import ke aplikasi Bruno.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "1.1 Register Mahasiswa",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Accept", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama_lengkap\": \"Ahmad Dahlan\",\n  \"email\": \"ahmad@student.unper.ac.id\",\n  \"password\": \"password123\",\n  \"no_hp\": \"08123456789\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/api/v1/auth/register", "host": ["{{base_url}}"], "path": ["api", "v1", "auth", "register"] }
+          }
+        },
+        {
+          "name": "1.2 Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Accept", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ahmad@student.unper.ac.id\",\n  \"password\": \"password123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/api/v1/auth/login", "host": ["{{base_url}}"], "path": ["api", "v1", "auth", "login"] }
+          }
+        },
+        {
+          "name": "1.3 Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": { "raw": "{{base_url}}/api/v1/auth/profile", "host": ["{{base_url}}"], "path": ["api", "v1", "auth", "profile"] }
+          }
+        },
+        {
+          "name": "1.4 Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": { "raw": "{{base_url}}/api/v1/auth/logout", "host": ["{{base_url}}"], "path": ["api", "v1", "auth", "logout"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Mading (Items)",
+      "item": [
+        {
+          "name": "2.1 Lihat Papan Mading",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Accept", "value": "application/json"}
+            ],
+            "url": { "raw": "{{base_url}}/api/v1/items", "host": ["{{base_url}}"], "path": ["api", "v1", "items"] }
+          }
+        },
+        {
+          "name": "2.2 Buat Laporan Barang (Lost/Found)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {"key": "judul", "value": "Dompet Coklat", "type": "text"},
+                {"key": "deskripsi", "value": "Ditemukan dompet kulit coklat.", "type": "text"},
+                {"key": "deskripsi_rahasia", "value": "Ada KTP atas nama Budi.", "type": "text"},
+                {"key": "post_type", "value": "found", "type": "text"},
+                {"key": "tanggal_lapor", "value": "2026-06-20 10:00:00", "type": "text"},
+                {"key": "category_id", "value": "2", "type": "text"},
+                {"key": "location_id", "value": "4", "type": "text"}
+              ]
+            },
+            "url": { "raw": "{{base_url}}/api/v1/items", "host": ["{{base_url}}"], "path": ["api", "v1", "items"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Claims Processing",
+      "item": [
+        {
+          "name": "3.1 Ajukan Klaim",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {"key": "item_id", "value": "1", "type": "text"},
+                {"key": "bukti_teks", "value": "Itu dompet saya, isinya uang dan KTP saya", "type": "text"}
+              ]
+            },
+            "url": { "raw": "{{base_url}}/api/v1/claims", "host": ["{{base_url}}"], "path": ["api", "v1", "claims"] }
+          }
+        },
+        {
+          "name": "3.2 Antrean Klaim (Khusus Satpam)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": { "raw": "{{base_url}}/api/v1/claims", "host": ["{{base_url}}"], "path": ["api", "v1", "claims"] }
+          }
+        },
+        {
+          "name": "3.3 Verifikasi Klaim (Khusus Satpam)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status_verif\": \"approved\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/api/v1/claims/1/verify", "host": ["{{base_url}}"], "path": ["api", "v1", "claims", "1", "verify"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Handover & Archiving",
+      "item": [
+        {
+          "name": "4.1 Eksekusi Serah Terima (Satpam)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {"key": "token_pengambilan", "value": "LF-ORANGE-XXXXXX", "type": "text"},
+                {"key": "foto_serah_terima", "value": "", "type": "file"}
+              ]
+            },
+            "url": { "raw": "{{base_url}}/api/v1/handovers", "host": ["{{base_url}}"], "path": ["api", "v1", "handovers"] }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "token",
+      "value": "PASTE_TOKEN_LOGIN_DI_SINI"
+    }
+  ]
+}

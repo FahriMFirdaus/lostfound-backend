@@ -31,6 +31,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/admin/items', [ItemController::class, 'adminIndex']);
         Route::post('/items', [ItemController::class, 'store']);
         Route::patch('/items/{id}/release', [ItemController::class, 'release']);
+        Route::patch('/items/{id}/reject', [ItemController::class, 'reject']);
         
         // Rute Klaim Barang (Fase 4)
         Route::get('/claims', [ClaimController::class, 'index']);
