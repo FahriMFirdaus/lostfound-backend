@@ -21,15 +21,6 @@ class UserSeeder extends Seeder
             'updated_at' => now(),
         ]);
         
-        // Insert Contoh Mahasiswa
-        DB::table('users')->insert([
-            'nama_lengkap' => 'Ahmad Dahlan',
-            'email' => 'ahmad@student.unper.ac.id',
-            'password' => Hash::make('password123'),
-            'no_hp' => '082222222222',
-            'role' => 'student',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        // Insert Contoh Mahasiswa dihapus sesuai permintaan
     }
 }

@@ -10,8 +10,8 @@ php artisan cache:clear
 # Jalankan migrasi database
 php artisan migrate --force
 
-# Jalankan seeder database (Jika belum pernah, Render akan me-run ini saat build)
-# php artisan db:seed --force
+# Jalankan seeder database (Hanya berisi admin, kategori, dan lokasi)
+php artisan db:seed --force
 
 # Mulai Nginx di background
 nginx
