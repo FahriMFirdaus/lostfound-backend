@@ -20,7 +20,8 @@ class HandoverController extends Controller
 
         $request->validate([
             'token_pengambilan' => 'required|string|exists:claims,token_pengambilan',
-            'foto_materai' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+            'foto_materai' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'foto_serah_terima' => 'nullable|image|mimes:jpg,jpeg,png|max:4096'
         ]);
 
         // Verifikasi token 12-digit (LF-ORANGE-XXXXXX)
@@ -37,11 +38,18 @@ class HandoverController extends Controller
         if ($request->hasFile('foto_materai')) {
             $materaiPath = $request->file('foto_materai')->store('handovers', 'public');
         }
-        $handover = DB::transaction(function () use ($claim, $request, $materaiPath) {
+
+        $serahTerimaPath = null;
+        if ($request->hasFile('foto_serah_terima')) {
+            $serahTerimaPath = $request->file('foto_serah_terima')->store('handovers_fisik', 'public');
+        }
+
+        $handover = DB::transaction(function () use ($claim, $request, $materaiPath, $serahTerimaPath) {
             $handover = Handover::create([
                 'claim_id' => $claim->id,
                 'admin_id' => $request->user()->id,
                 'foto_materai' => $materaiPath,
+                'foto_serah_terima' => $serahTerimaPath,
                 'tanggal_serah_terima' => now(),
             ]);
 
