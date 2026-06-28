@@ -3,6 +3,10 @@
 # Buat symbolic link storage
 php artisan storage:link
 
+# Bersihkan cache
+php artisan config:clear
+php artisan cache:clear
+
 # Jalankan migrasi database
 php artisan migrate --force
 
