@@ -8,6 +8,8 @@ use App\Http\Controllers\HandoverController;
 Route::prefix('v1')->group(function () {
     Route::post('/auth/register', [AuthController::class, 'register']);
     Route::post('/auth/login', [AuthController::class, 'login']);
+    Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
+    Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
     
     // Rute Publik (Mading Digital)
     Route::get('/items', [ItemController::class, 'index']);
@@ -18,8 +20,10 @@ Route::prefix('v1')->group(function () {
         Route::get('/auth/profile', [AuthController::class, 'profile']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         
-        // Rute Manajemen User
+        // User Management (Admin)
         Route::get('/users', [\App\Http\Controllers\UserController::class, 'index']);
+        Route::post('/users', [\App\Http\Controllers\UserController::class, 'store']);
+        Route::put('/users/{id}', [\App\Http\Controllers\UserController::class, 'update']);
         Route::delete('/users/{id}', [\App\Http\Controllers\UserController::class, 'destroy']);
 
         // Rute Lokasi
