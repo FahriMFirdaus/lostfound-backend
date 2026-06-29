@@ -28,14 +28,40 @@
             "header": [{"key": "Accept", "value": "application/json"}],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"ahmad@student.unper.ac.id\",\n  \"password\": \"password123\"\n}",
+              "raw": "{\n  \"email\": \"satpam@unper.ac.id\",\n  \"password\": \"password123\"\n}",
               "options": { "raw": { "language": "json" } }
             },
             "url": { "raw": "{{base_url}}/api/v1/auth/login", "host": ["{{base_url}}"], "path": ["api", "v1", "auth", "login"] }
           }
         },
         {
-          "name": "1.3 Get Profile",
+          "name": "1.3 Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ahmad@student.unper.ac.id\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/api/v1/auth/forgot-password", "host": ["{{base_url}}"], "path": ["api", "v1", "auth", "forgot-password"] }
+          }
+        },
+        {
+          "name": "1.4 Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ahmad@student.unper.ac.id\",\n  \"password\": \"passwordbaru123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/api/v1/auth/reset-password", "host": ["{{base_url}}"], "path": ["api", "v1", "auth", "reset-password"] }
+          }
+        },
+        {
+          "name": "1.5 Get Profile",
           "request": {
             "method": "GET",
             "header": [
@@ -46,18 +72,23 @@
           }
         },
         {
-          "name": "1.4 Get User Riwayat Activity",
+          "name": "1.6 Update Profile",
           "request": {
-            "method": "GET",
+            "method": "PUT",
             "header": [
               {"key": "Accept", "value": "application/json"},
               {"key": "Authorization", "value": "Bearer {{token}}"}
             ],
-            "url": { "raw": "{{base_url}}/api/v1/auth/riwayat", "host": ["{{base_url}}"], "path": ["api", "v1", "auth", "riwayat"] }
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama_lengkap\": \"Ahmad Dahlan Update\",\n  \"no_hp\": \"08987654321\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/api/v1/auth/profile", "host": ["{{base_url}}"], "path": ["api", "v1", "auth", "profile"] }
           }
         },
         {
-          "name": "1.5 Get Dashboard Stats",
+          "name": "1.7 Get Dashboard Stats",
           "request": {
             "method": "GET",
             "header": [
@@ -68,7 +99,18 @@
           }
         },
         {
-          "name": "1.6 Logout",
+          "name": "1.8 Get User Riwayat",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": { "raw": "{{base_url}}/api/v1/auth/riwayat", "host": ["{{base_url}}"], "path": ["api", "v1", "auth", "riwayat"] }
+          }
+        },
+        {
+          "name": "1.9 Logout",
           "request": {
             "method": "POST",
             "header": [
@@ -81,21 +123,29 @@
       ]
     },
     {
-      "name": "2. Items (Mading & Antrean)",
+      "name": "2. Items & Reports",
       "item": [
         {
-          "name": "2.1 Lihat Papan Mading (Fuzzy Search)",
+          "name": "2.1 Get Items (Mading)",
           "request": {
             "method": "GET",
             "header": [{"key": "Accept", "value": "application/json"}],
-            "url": { "raw": "{{base_url}}/api/v1/items?post_type=lost&q=Kunci Motor Honda", "host": ["{{base_url}}"], "path": ["api", "v1", "items"], "query": [
+            "url": { "raw": "{{base_url}}/api/v1/items?post_type=lost&q=Dompet", "host": ["{{base_url}}"], "path": ["api", "v1", "items"], "query": [
               {"key": "post_type", "value": "lost"},
-              {"key": "q", "value": "Kunci Motor Honda"}
+              {"key": "q", "value": "Dompet"}
             ]}
           }
         },
         {
-          "name": "2.2 Buat Laporan Barang (Lost/Found)",
+          "name": "2.2 Get Item Detail",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": { "raw": "{{base_url}}/api/v1/items/1", "host": ["{{base_url}}"], "path": ["api", "v1", "items", "1"] }
+          }
+        },
+        {
+          "name": "2.3 Create Item Report",
           "request": {
             "method": "POST",
             "header": [
@@ -106,10 +156,10 @@
               "mode": "formdata",
               "formdata": [
                 {"key": "judul", "value": "Dompet Coklat", "type": "text"},
-                {"key": "deskripsi", "value": "Ditemukan dompet kulit coklat.", "type": "text"},
-                {"key": "deskripsi_rahasia", "value": "Ada KTP atas nama Budi.", "type": "text"},
+                {"key": "deskripsi", "value": "Ditemukan dompet.", "type": "text"},
+                {"key": "deskripsi_rahasia", "value": "Ada KTP.", "type": "text"},
                 {"key": "post_type", "value": "found", "type": "text"},
-                {"key": "tanggal_lapor", "value": "2026-06-20 10:00:00", "type": "text"},
+                {"key": "tanggal_lapor", "value": "2026-06-20", "type": "text"},
                 {"key": "category_id", "value": "2", "type": "text"},
                 {"key": "location_id", "value": "4", "type": "text"}
               ]
@@ -118,7 +168,7 @@
           }
         },
         {
-          "name": "2.3 Lihat Antrean Barang (Khusus Satpam)",
+          "name": "2.4 Admin Get Items (Antrean)",
           "request": {
             "method": "GET",
             "header": [
@@ -131,7 +181,7 @@
           }
         },
         {
-          "name": "2.4 Terima & Rilis Barang (Khusus Satpam)",
+          "name": "2.5 Admin Release Item",
           "request": {
             "method": "PATCH",
             "header": [
@@ -142,7 +192,7 @@
           }
         },
         {
-          "name": "2.5 Tolak/Batalkan Barang (Khusus Satpam)",
+          "name": "2.6 Admin Reject Item",
           "request": {
             "method": "PATCH",
             "header": [
@@ -158,7 +208,7 @@
       "name": "3. Claims Processing",
       "item": [
         {
-          "name": "3.1 Ajukan Klaim",
+          "name": "3.1 Create Claim",
           "request": {
             "method": "POST",
             "header": [
@@ -169,16 +219,25 @@
               "mode": "formdata",
               "formdata": [
                 {"key": "item_id", "value": "1", "type": "text"},
-                {"key": "bukti_teks", "value": "Itu dompet saya, isinya uang dan KTP saya", "type": "text"},
-                {"key": "foto_ktp", "type": "file"},
-                {"key": "foto_bukti_pendukung", "type": "file"}
+                {"key": "bukti_teks", "value": "Itu dompet saya", "type": "text"}
               ]
             },
             "url": { "raw": "{{base_url}}/api/v1/claims", "host": ["{{base_url}}"], "path": ["api", "v1", "claims"] }
           }
         },
         {
-          "name": "3.2 Daftar Semua Klaim (Satpam)",
+          "name": "3.2 Get My Claims",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": { "raw": "{{base_url}}/api/v1/claims/my-claims", "host": ["{{base_url}}"], "path": ["api", "v1", "claims", "my-claims"] }
+          }
+        },
+        {
+          "name": "3.3 Get All Claims (Admin)",
           "request": {
             "method": "GET",
             "header": [
@@ -189,7 +248,18 @@
           }
         },
         {
-          "name": "3.3 Verifikasi Klaim (Satpam)",
+          "name": "3.4 Get Claim Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": { "raw": "{{base_url}}/api/v1/claims/1", "host": ["{{base_url}}"], "path": ["api", "v1", "claims", "1"] }
+          }
+        },
+        {
+          "name": "3.5 Verify Claim (Admin)",
           "request": {
             "method": "PATCH",
             "header": [
@@ -198,30 +268,30 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"status_verif\": \"approved\",\n  \"catatan\": \"KTP sesuai dengan barang\"\n}",
+              "raw": "{\n  \"status_verif\": \"approved\",\n  \"catatan\": \"Sesuai\"\n}",
               "options": { "raw": { "language": "json" } }
             },
             "url": { "raw": "{{base_url}}/api/v1/claims/1/verify", "host": ["{{base_url}}"], "path": ["api", "v1", "claims", "1", "verify"] }
           }
         },
         {
-          "name": "3.4 Cari Klaim via Token (Satpam)",
+          "name": "3.6 Get Claim By Token",
           "request": {
             "method": "GET",
             "header": [
               {"key": "Accept", "value": "application/json"},
               {"key": "Authorization", "value": "Bearer {{token}}"}
             ],
-            "url": { "raw": "{{base_url}}/api/v1/claims/token/LF-ORANGE-XXXXXX", "host": ["{{base_url}}"], "path": ["api", "v1", "claims", "token", "LF-ORANGE-XXXXXX"] }
+            "url": { "raw": "{{base_url}}/api/v1/claims/token/LF-123456", "host": ["{{base_url}}"], "path": ["api", "v1", "claims", "token", "LF-123456"] }
           }
         }
       ]
     },
     {
-      "name": "4. Handover & Archiving",
+      "name": "4. Handovers",
       "item": [
         {
-          "name": "4.1 Eksekusi Serah Terima (Satpam)",
+          "name": "4.1 Create Handover",
           "request": {
             "method": "POST",
             "header": [
@@ -231,11 +301,134 @@
             "body": {
               "mode": "formdata",
               "formdata": [
-                {"key": "claim_id", "value": "1", "type": "text"},
-                {"key": "foto_serah_terima", "type": "file"}
+                {"key": "claim_id", "value": "1", "type": "text"}
               ]
             },
             "url": { "raw": "{{base_url}}/api/v1/handovers", "host": ["{{base_url}}"], "path": ["api", "v1", "handovers"] }
+          }
+        },
+        {
+          "name": "4.2 Get Handover Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": { "raw": "{{base_url}}/api/v1/handovers/1", "host": ["{{base_url}}"], "path": ["api", "v1", "handovers", "1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. User Management",
+      "item": [
+        {
+          "name": "5.1 Get Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": { "raw": "{{base_url}}/api/v1/users", "host": ["{{base_url}}"], "path": ["api", "v1", "users"] }
+          }
+        },
+        {
+          "name": "5.2 Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama_lengkap\": \"Budi Admin\",\n  \"email\": \"budi@unper.ac.id\",\n  \"password\": \"password123\",\n  \"role\": \"admin\",\n  \"no_hp\": \"089123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/api/v1/users", "host": ["{{base_url}}"], "path": ["api", "v1", "users"] }
+          }
+        },
+        {
+          "name": "5.3 Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama_lengkap\": \"Budi Admin Edit\",\n  \"role\": \"satpam\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/api/v1/users/3", "host": ["{{base_url}}"], "path": ["api", "v1", "users", "3"] }
+          }
+        },
+        {
+          "name": "5.4 Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": { "raw": "{{base_url}}/api/v1/users/3", "host": ["{{base_url}}"], "path": ["api", "v1", "users", "3"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Master Data (Locations & Categories)",
+      "item": [
+        {
+          "name": "6.1 Get Locations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": { "raw": "{{base_url}}/api/v1/locations", "host": ["{{base_url}}"], "path": ["api", "v1", "locations"] }
+          }
+        },
+        {
+          "name": "6.2 Add Location",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama_tempat\": \"Gedung A\",\n  \"detail_lokasi\": \"Lantai 1\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/api/v1/locations", "host": ["{{base_url}}"], "path": ["api", "v1", "locations"] }
+          }
+        },
+        {
+          "name": "6.3 Delete Location",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": { "raw": "{{base_url}}/api/v1/locations/1", "host": ["{{base_url}}"], "path": ["api", "v1", "locations", "1"] }
+          }
+        },
+        {
+          "name": "6.4 Get Categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": { "raw": "{{base_url}}/api/v1/categories", "host": ["{{base_url}}"], "path": ["api", "v1", "categories"] }
           }
         }
       ]
@@ -244,7 +437,7 @@
   "variable": [
     {
       "key": "base_url",
-      "value": "http://127.0.0.1:8000"
+      "value": "https://lostfound-backend-pwtf.onrender.com"
     },
     {
       "key": "token",
